@@ -1,44 +1,17 @@
 - job:
-    name: centos-container-pipeline-service-container-index
+    name: centos-container-pipeline-service-pre-build-{project_name}
     description: |
         Managed by Jenkins Job Builder, do not edit manually!
     node: container
     properties:
         - github:
-            url: https://github.com/CentOS/container-index
-    triggers:
-        - github-pull-request:
-            admin-list:
-              - rtnpro
-              - kbsingh
-              - bamachrn
-              - mohammedzee1000
-              - dharmit
-              - navidshaikh
-            white-list:
-              - rtnpro
-              - kbsingh
-              - bamachrn
-              - mohammedzee1000
-              - dharmit
-              - navidshaikh
-            cron: '* * * * *'
-            github-hooks: false
-            permit-all: true
-
-    wrappers:
-        - ansicolor
+            url: "{project_git_url}"
     scm:
         - git:
-            url: https://github.com/CentOS/container-index.git
+            url: "{project_git_url}"
             skip-tag: True
             git-tool: ci-git
-            branches: master
-            refspec: "+refs/pull/*:refs/remotes/origin/pr/*"
-            branches:
-                - "${ghprbactualcommit}"
+            branches: "{project_git_branch}"
     builders:
-        - git-fast-forward-branch
-        - shell: |
-            curl https://raw.githubusercontent.com/CentOS/container-pipeline-service/master/ci/cccp_ci_container_index.sh > cccp_ci_container_index.sh
-            sh ./cccp_ci_container_index.sh
+        - python: |
+            cccp_pre_build.py project_git_url, project_git_branch, script_path
