@@ -7,11 +7,12 @@
         - github:
             url: "{project_git_url}"
     scm:
-        - git:
+        - git
             url: "{project_git_url}"
             skip-tag: True
             git-tool: ci-git
-            branches: "{project_git_branch}"
+            branches:
+                - "{project_git_branch}"
     builders:
         - python: |
             cccp_pre_build.py {project_git_url} {project_git_branch} {script_path}
