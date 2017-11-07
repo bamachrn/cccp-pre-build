@@ -1,18 +1,18 @@
 - job:
-    name: centos-container-pipeline-service-pre-build-{project_name}
+    name: centos-container-pipeline-service-pre-build
     description: |
         Managed by Jenkins Job Builder, do not edit manually!
     node: container
     properties:
         - github:
-            url: "{project_git_url}"
+            url: "https://github.com/bamachrn/cccp-pre-build.git"
     scm:
-        - git
-            url: "{project_git_url}"
+        - git:
+            url: "https://github.com/bamachrn/cccp-pre-build.git"
             skip-tag: True
             git-tool: ci-git
             branches:
-                - "{project_git_branch}"
+                - "master"
     builders:
         - python: |
             cccp_pre_build.py {project_git_url} {project_git_branch} {script_path}
