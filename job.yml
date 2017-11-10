@@ -1,18 +1,41 @@
 - job:
-    name: centos-container-pipeline-service-pre-build
+    name: centos-container-pipeline-service-pre-build-{project_name}
     description: |
         Managed by Jenkins Job Builder, do not edit manually!
     node: container
     properties:
         - github:
-            url: "https://github.com/bamachrn/cccp-pre-build.git"
+            url: "{project_git_url}"
     scm:
         - git:
-            url: "https://github.com/bamachrn/cccp-pre-build.git"
+            url: "{project_git_url}"
             skip-tag: True
             git-tool: ci-git
             branches:
-                - "master"
+                - "{project_git_branch}"
     builders:
-        - python: |
-            cccp_pre_build.py {project_git_url} {project_git_branch} {script_path}
+        - shell: |
+            export CICO_API_KEY=$(cat ~/duffy.key )
+            while true
+            do
+                cico_output=$(cico node get -f value -c ip_address -c comment)
+                if [ $? -eq 0 ]; then
+                    read CICO_hostname CICO_ssid <<< $cico_output
+                    if  [ ! -z "$CICO_hostname" ]; then
+                        # we got hostname from cico
+                        break
+                    fi
+                    echo "'cico node get' succeed, but can't get hostname from output"
+                fi
+                if [ $n -gt 5 ]; then
+                    # give up after 5 tries
+                    echo "giving up on 'cico node get'"
+                    exit 1
+                fi
+                echo "'cico node get' failed, trying again in 60s ($n/5)"
+                n=$[$n+1]
+                sleep 60
+            done
+            sshopts="-t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l root"
+            ssh_cmd="ssh $sshopts $CICO_hostname"
+            $ssh_cmd {script_path}
