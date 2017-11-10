@@ -1,3 +1,11 @@
+- wrapper:
+    name: upload-pre-built-data
+    wrappers:
+        - credentials-binding:
+            - text:
+                credential-id: 
+                variable: GH_TOKEN
+
 - job:
     name: centos-container-pipeline-service-pre-build-{project_name}
     description: |
@@ -50,4 +58,3 @@
               # fail mode gives us 12 hrs to debug the machine
               curl "http://admin.ci.centos.org:8080/Node/fail?key=$CICO_API_KEY&ssid=$CICO_ssid"
             fi
-            exit $rtn_code
